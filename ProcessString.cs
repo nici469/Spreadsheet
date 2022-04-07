@@ -136,7 +136,7 @@ namespace Spreadsheet
                     currrentString += fullString[i];
                 }
 
-                //cut out the any discovered line from fullString
+                //cut out the any discovered string from fullString
                 fullString = CutString(fullString, nearestSepPos);
                 lines = AddLine(lines, currrentString);
 
