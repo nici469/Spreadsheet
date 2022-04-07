@@ -3,6 +3,7 @@
 namespace Spreadsheet
 {
     using IronXL;
+    using System.IO;
     class Program
     {
       
@@ -10,6 +11,14 @@ namespace Spreadsheet
     static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            Console.WriteLine(args.Length);
+            
+            //TestProcessString();
+            CSVtoJGD();
+        }
+
+        static void TestSpreadsheet()
+        {
             WorkBook workbook = WorkBook.Create(ExcelFileFormat.XLSX);
             var sheet = workbook.CreateWorkSheet("example_sheet");
             sheet["A1"].Value = "Example";
@@ -29,8 +38,44 @@ namespace Spreadsheet
             }
             workbook.SaveAs("example_workbook.xlsx");
 
-            Console.WriteLine(args.Length);
-
+            
         }
+        static void TestProcessString()
+        {
+            ProcessString processor = new ProcessString();
+            var strings = "1 This is a-2 string-3 separated with spaces-4 but majorly-5  by-6 hyphen";
+            var lines = processor.SeparateLines(strings, '-');
+
+            foreach (string s in lines) Console.WriteLine(s);
+            Console.WriteLine("The number of separate strings is " + lines.Length);
+            Console.ReadKey(true);
+        }
+
+        /// <summary>
+        /// to test the conversion of a CSV file to a jagged array
+        /// </summary>
+        /// <param name="csvString"></param>
+        static void CSVtoJGD()
+        {
+            string testCSV = "this,is,the,first,line\nThis,is,the,second,line\nAnd,this,then,is,the,third,line you know";
+            ProcessString processor = new ProcessString();
+
+            //separate the string into lines.. unnecessary if File.ReadAllLines is used
+            string[] lines = processor.SeparateLines(testCSV, '\n');
+            
+            //initialise the jagged array[row][column]. the number of rows is the number of elements in the lines array
+            string[][] csvJgdArray = new string[lines.Length][];
+
+            //in each line, separtae the strings usinng commas
+            for(int i = 0; i < lines.Length; i++)
+            {
+                csvJgdArray[i] = processor.SeparateLines(lines[i], ',');
+            }
+
+            Console.WriteLine("there are {0} lines in the given string", lines.Length);
+            Console.WriteLine("the number of elements in line 3 is: {0}", csvJgdArray[2].Length);
+            Console.ReadKey(true);
+        }
+
     }
 }

@@ -4,58 +4,13 @@ using System.Text;
 
 namespace Spreadsheet
 {
+    /// <summary>
+    /// A class for handling String cutting or string-to-array operations, given a specified separator
+    /// tested and trusted
+    /// </summary>
     class ProcessString
     {
-        /// <summary>
-        /// converts the inputString into an array of its component lines
-        /// </summary>
-        /// <param name="inputString"></param>
-        /// <returns></returns>
-        string[] SeparateLines(string inputString)
-        {
-            //to store each separate line in the inputString as an element of an array
-            string[] lines= new string[0];
-
-            string fullString = inputString;
-            
-            //to store the number of newline characters in the input string
-            int noOfNewLineChar = 0;
-            
-            //count the number of newline characters in the fullString
-            for(int i = 0; i < fullString.Length; i++)
-            {
-                if (fullString[i] == '\n') noOfNewLineChar++;
-            }
-
-            
-            //loop through all the lines in the fullString
-            for(int linecount= noOfNewLineChar; linecount > 0; linecount--)
-            {
-                //in each iteration, search for the nearest newline character
-                int nearestNwLnPos = 0;
-
-                for(int i = 0; i < fullString.Length; i++)
-                {
-                    if (fullString[i] == '\n') { nearestNwLnPos = i;break; }
-                }
-
-                //extract the topmost line 
-                string currrentLine=null;
-                for(int i = 0; i < nearestNwLnPos; i++)
-                {
-                    currrentLine += fullString[i];
-                }
-
-                //cut out the any discovered line from fullString
-                fullString = CutString(fullString, nearestNwLnPos);
-                lines = AddLine(lines,currrentLine);
-
-            }
-
-            return lines;
-
-        }
-
+       
         /// <summary>
         /// cuts out portions of the data string from the first character up to and including the specified position
         /// and returns the new string
@@ -101,7 +56,7 @@ namespace Spreadsheet
         /// </summary>
         /// <param name="inputString"></param>
         /// <param name="separator"></param>
-        string[] SeparateLines(string inputString, char separator)
+        public string[] SeparateLines(string inputString, char separator)
         {
             //to store each separate strings in the inputString as an element of an array
             string[] lines = new string[0];
@@ -141,6 +96,10 @@ namespace Spreadsheet
                 lines = AddLine(lines, currrentString);
 
             }
+
+            //add any final string that didnt end with the separator, such as the last line in a string file
+            if (fullString!=null) { lines = AddLine(lines,fullString); }
+
             return lines;
 
         }
