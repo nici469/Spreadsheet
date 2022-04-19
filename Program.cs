@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Spreadsheet
 {
@@ -11,12 +12,34 @@ namespace Spreadsheet
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            Console.WriteLine(args.Length);
+            Console.WriteLine("the number of arguments is "+args.Length);
+                      
+            //it is assumed that arg[0] is path to the csv string
+            //and arg[1] is the filepath to save the xl file to
+            var xl = new ExcelClass();
+
+            //read all the lines from the file 
+            string[] csvString = File.ReadAllLines(args[0]);
+            xl.CreateXlFromCSV(csvString, args[1]);
+            Console.WriteLine("XL file successfully created");
+        }
+        static void Main2(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+            Console.WriteLine("the number of arguments is " + args.Length);
 
             //TestProcessString();
             //CSVtoJGD();
             //TestClosedXML();
-            TestProcessStringJGD();
+            //TestProcessStringJGD();
+            var csv = "22,,33,,22,,\n2.1,,22,,";
+            //it is assumed that arg[0] is the csv string
+            //and arg[1] is the filepath to save the xl file to
+            var xl = new ExcelClass();
+            //xl.CreateXlFromCSV(csv, "xl.xlsx");
+            xl.CreateXlFromCSV(args[0], args[1]);
+
+            Console.WriteLine("XL file successfully created");
         }
 
         /// <summary>

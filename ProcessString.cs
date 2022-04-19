@@ -128,6 +128,27 @@ namespace Spreadsheet
             return csvJgdArray;
         }
 
+        /// <summary>
+        /// converts an array of comma-separated strings ta a jgd array
+        /// , the comma determinig the columns
+        /// </summary>
+        /// <param name="lineData"></param>
+        /// <returns></returns>
+        public string[][] StringArraytoJGD(string[] lineData)
+        {
+           
+            //initialise the jagged array[row][column]. the number of rows is the number of elements in the lines array
+            string[][] csvJgdArray = new string[lineData.Length][];
+
+            //in each line, separtae the strings usinng commas
+            for (int i = 0; i < lineData.Length; i++)
+            {
+                csvJgdArray[i] = SeparateLines(lineData[i], ',');
+            }
+
+            return csvJgdArray;
+        }
+
 
 
     }
