@@ -42,7 +42,7 @@ namespace Spreadsheet
             ws.Cell(4, 2).Value = "Project:";
             ws.Cell(4, 4).Value = "ClosedXML Example";
             ws.Cell(6, 2).Value = "Author:";
-            ws.Cell(6, 4).Value = "KnapSac";
+            ws.Cell(6, 4).Value = "KnapSac"; 
 
             ws.Cell(2, 3).Style.Fill.SetBackgroundColor(XLColor.Cyan);
 
@@ -79,13 +79,34 @@ namespace Spreadsheet
                 for(int j = 0; j < lineData.Length; j++)
                 {
                     //info cell occurs every 2 cells in each row, starting from the second cell at j=1 index
-                    if ((j + 1) % 2 == 0) { ImplementCellInfo(); continue; }
+                    if ((j + 1) % 2 == 0)
+                    {
+                        int row = i + 1;//the row number of the cell to be formatted with the info data
+                        int col = (j + 1) / 2;//the column number of the cell to be formatted with the  info data
+                        ImplementCellInfo(row, col, ws, lineData[j]);
+                        continue;
+                    }
 
                     //if a data cell is found at the end of the line and it has no info cell after it or there is 
                     //no other cell after it, ignore the cell and break out of column iteration[j],...
                     //such cells occur because of how the csv is create in javascript
                     if (j + 1 >= lineData.Length) { break; }
-                    ws.Cell(i + 1, (j + 2) / 2).Value = double.Parse(lineData[j]);
+                    
+                    //ignore any empty data cells
+                    if (lineData[j] != null)
+                    {
+                        //attempt to convert the data to a double
+                        try
+                        {
+                            ws.Cell(i + 1, (j + 2) / 2).Value = double.Parse(lineData[j]);
+                        }
+                        //if the data cannot be converted to a double, store it as a string
+                        catch (Exception e)
+                        {
+                            ws.Cell(i + 1, (j + 2) / 2).Value = lineData[j];
+                        }
+
+                    }
                 }
             }
 
@@ -116,7 +137,13 @@ namespace Spreadsheet
                 for (int j = 0; j < lineData.Length; j++)
                 {
                     //info cell occurs every 2 cells in each row, starting from the second cell at j=1 index
-                    if ((j + 1) % 2 == 0) { ImplementCellInfo(); continue; }
+                    if ((j + 1) % 2 == 0) {
+                        int row = i + 1;//the row number of the cell to be formatted with the info data
+                        int col = (j + 1) / 2;//the column number of the cell to be formatted with the  info data
+
+                        if (lineData[j] != null) { ImplementCellInfo(row, col, ws, lineData[j]); }
+                        continue; 
+                    }
 
                     //if a data cell is found at the end of the line and it has no info cell after it or there is 
                     //no other cell after it, ignore the cell and break out of column iteration[j],...
@@ -142,8 +169,61 @@ namespace Spreadsheet
             wb.SaveAs(filepath);
         }
 
+        /// <summary>
+        /// formats the specified row and column of the IXLworksheet with the infoString
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <param name="ws"></param>
+        /// <param name="infoString"></param>
+        void ImplementCellInfo(int row, int col, IXLWorksheet ws, string infoString) {
+            //info data in an info string are separated by hyphen character
+            var infoArray = (new ProcessString()).SeparateLines(infoString, '-');
 
-        void ImplementCellInfo() { }
+            for(int i = 0; i < infoArray.Length; i++)
+            {
+                string singleInfo = infoArray[i];
+                //check the first character: "format" strings begin with F, e.g FHeader,
+                //while color strings begin with C, e.g CBlue
+                var infoType = singleInfo[0];
+
+                switch (infoType)
+                {
+                    case 'C'://if the first character is a 'C"
+                        switch (singleInfo) {
+                            case "CRed":
+                                ws.Cell(row, col).Style.Fill.BackgroundColor = XLColor.Red;
+                                break;
+                            case "CBlue":
+                                ws.Cell(row, col).Style.Fill.BackgroundColor = XLColor.Blue;
+                                break;
+                            case "CGreen":
+                                ws.Cell(row, col).Style.Fill.BackgroundColor = XLColor.Green;
+                                break;
+                        }
+                        break;
+
+                    case 'F'://if the first character is an 'F'
+                        switch (singleInfo)
+                        {
+                            //header only needs to be specified on one cell of the row
+                            //it automatically affects the whole row
+                            case "FHeader":
+                                ws.Row(row).Style.Font.Italic = true;
+                                ws.Row(row).Style.Font.FontSize = 14;
+                                ws.Row(row).Style.Font.Bold = true;
+                                //ws.Cell(row, col).Style.Font.Italic = true;
+                                break;
+                            case "FOutline"://for cells like the o-Clock cells at the beginning of each row
+                                ws.Cell(row, col).Style.Font.Bold = true;
+                                ws.Cell(row, col).Style.Font.Italic = true;
+                                break;
+                        }
+                        break;
+
+                }
+            }
+        }
 
     }
 }
