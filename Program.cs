@@ -8,16 +8,29 @@ namespace Spreadsheet
     {
       
         
-    static void Main(string[] args)
+        static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
             Console.WriteLine(args.Length);
-            
+
             //TestProcessString();
-            CSVtoJGD();
+            //CSVtoJGD();
+            //TestClosedXML();
+            TestProcessStringJGD();
         }
 
-        static void TestSpreadsheet()
+        /// <summary>
+        /// for studying and testing ClosedXML
+        /// </summary>
+        static void TestClosedXML()
+        {
+            ExcelClass excel = new ExcelClass();
+            excel.Create2("studioWorkbook.xlsx");
+            Console.WriteLine("Spreadsheet created");
+            Console.ReadKey(true);
+        }
+
+        static void TestIronXL()
         {
             WorkBook workbook = WorkBook.Create(ExcelFileFormat.XLSX);
             var sheet = workbook.CreateWorkSheet("example_sheet");
@@ -40,6 +53,10 @@ namespace Spreadsheet
 
             
         }
+
+        /// <summary>
+        /// for testing the ProcessString class: This method is soon to be discarded
+        /// </summary>
         static void TestProcessString()
         {
             ProcessString processor = new ProcessString();
@@ -52,7 +69,8 @@ namespace Spreadsheet
         }
 
         /// <summary>
-        /// to test the conversion of a CSV file to a jagged array
+        /// to test the conversion of a CSV file to a jagged array: soon to be 
+        /// discarded
         /// </summary>
         /// <param name="csvString"></param>
         static void CSVtoJGD()
@@ -77,5 +95,12 @@ namespace Spreadsheet
             Console.ReadKey(true);
         }
 
+        static void TestProcessStringJGD()
+        {
+            string data = "this,is,the first line\nthis, is ,the second line \nthis, is the ,third line,";
+            ProcessString processor = new ProcessString();
+            string[][] jdg = processor.CSVtoJGD(data);
+            Console.ReadKey(true);
+        }
     }
 }

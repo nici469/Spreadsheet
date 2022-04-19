@@ -105,5 +105,30 @@ namespace Spreadsheet
         }
 
 
+
+        /// <summary>
+        /// to convert a CSV string into a JGD array:
+        /// lines being rows, and comma determining columns
+        /// </summary>
+        /// <param name="csvString"></param>
+        public string[][] CSVtoJGD(string data)
+        {            
+            //separate the string into lines.. unnecessary if File.ReadAllLines is used
+            string[] lines = SeparateLines(data, '\n');
+
+            //initialise the jagged array[row][column]. the number of rows is the number of elements in the lines array
+            string[][] csvJgdArray = new string[lines.Length][];
+
+            //in each line, separtae the strings usinng commas
+            for (int i = 0; i < lines.Length; i++)
+            {
+                csvJgdArray[i] = SeparateLines(lines[i], ',');
+            }
+
+            return csvJgdArray;
+        }
+
+
+
     }
 }
