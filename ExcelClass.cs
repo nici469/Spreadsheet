@@ -124,7 +124,17 @@ namespace Spreadsheet
                     if (j + 1 >= lineData.Length) { break; }
                     //ignore any empty data cells
 
-                    if (lineData[j] != null) { ws.Cell(i + 1, (j + 2) / 2).Value = double.Parse(lineData[j]); }
+                    if (lineData[j] != null) {
+                        //attempt to convert the data to a double
+                        try {
+                            ws.Cell(i + 1, (j + 2) / 2).Value = double.Parse(lineData[j]);
+                        }
+                        //if the data cannot be converted to a double, store it as a string
+                        catch (Exception e) {
+                            ws.Cell(i + 1, (j + 2) / 2).Value = lineData[j];
+                        }
+                         
+                    }
                     
                 }
             }
