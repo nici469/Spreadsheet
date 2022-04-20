@@ -194,7 +194,7 @@ namespace Spreadsheet
                     case 'C'://if the first character is a 'C"
                         switch (singleInfo) {
                             case "CRed":
-                                ws.Cell(row, col).Style.Fill.BackgroundColor = XLColor.Red;
+                                ws.Cell(row, col).Style.Fill.BackgroundColor = XLColor.LightPink;
                                 break;
                             case "CBlue":
                                 ws.Cell(row, col).Style.Fill.BackgroundColor = XLColor.Blue;
