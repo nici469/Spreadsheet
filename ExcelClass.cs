@@ -127,6 +127,8 @@ namespace Spreadsheet
             //init Spreadsheet
             var wb = new XLWorkbook();
             IXLWorksheet ws = wb.Worksheets.Add("Sheet1", 1);
+            ws.Columns().Width = 9;
+            ws.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);//left alignment for the worksheet
 
             //loop through the rows in the csv data jgd array
             for (int i = 0; i < dataJGD.Length; i++)
@@ -210,13 +212,21 @@ namespace Spreadsheet
                             //it automatically affects the whole row
                             case "FHeader":
                                 ws.Row(row).Style.Font.Italic = true;
-                                ws.Row(row).Style.Font.FontSize = 14;
+                                ws.Row(row).Style.Font.FontSize = 13;
                                 ws.Row(row).Style.Font.Bold = true;
                                 //ws.Cell(row, col).Style.Font.Italic = true;
                                 break;
                             case "FOutline"://for cells like the o-Clock cells at the beginning of each row
                                 ws.Cell(row, col).Style.Font.Bold = true;
                                 ws.Cell(row, col).Style.Font.Italic = true;
+                                break;
+                            case "FTitle"://for cells/rows that carry the new day title
+                                IXLRange range = ws.Range(row, col, row, col + 17);
+                                range.Row(1).Merge();
+                                range.Style.Font.FontSize = 14;
+                                range.Style.Font.Bold = true;
+                                range.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                                //range.Columns().Cells().w
                                 break;
                         }
                         break;
