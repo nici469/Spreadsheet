@@ -7,6 +7,8 @@ namespace Spreadsheet
     using ClosedXML.Excel;
     class ExcelClass
     {
+        public int newDayRowLocation;
+        DateTime date;
         //IXLWorkbook 
         public void Create(String filepath)
         {
@@ -63,6 +65,7 @@ namespace Spreadsheet
         /// <param name="filepath"></param>
         public void CreateXlFromCSV(string CSVData, string filepath)
         {
+            date = DateTime.Now;
             var processor = new ProcessString();
             var dataJGD = processor.CSVtoJGD(CSVData);
 
@@ -99,6 +102,7 @@ namespace Spreadsheet
                         try
                         {
                             ws.Cell(i + 1, (j + 2) / 2).Value = double.Parse(lineData[j]);
+                            ws.Cell(i + 1, (j + 2) / 2).Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
                         }
                         //if the data cannot be converted to a double, store it as a string
                         catch (Exception e)
@@ -121,6 +125,7 @@ namespace Spreadsheet
         /// <param name="filepath"></param>
         public void CreateXlFromCSV(string[] CSVData, string filepath)
         {
+            date = DateTime.Now;
             var processor = new ProcessString();
             var dataJGD = processor.StringArraytoJGD(CSVData);
 
@@ -155,18 +160,34 @@ namespace Spreadsheet
 
                     if (lineData[j] != null) {
                         //attempt to convert the data to a double
-                        try {
+                        try { 
                             ws.Cell(i + 1, (j + 2) / 2).Value = double.Parse(lineData[j]);
+                            ws.Cell(i + 1, (j + 2) / 2).Style.Border.OutsideBorder = XLBorderStyleValues.Medium;
                         }
                         //if the data cannot be converted to a double, store it as a string
                         catch (Exception e) {
                             ws.Cell(i + 1, (j + 2) / 2).Value = lineData[j];
+
+                            //if the "Time" label on a new day is found, store the location in the newDayRowLocation
+                            //only its most updated value is used evenually, i.e the most recent day in the csv file
+                            if (lineData[j] == "Time")
+                            {
+                                newDayRowLocation = i + 1;
+                            }
                         }
                          
                     }
                     
                 }
             }
+
+            IXLRange range = ws.Range(newDayRowLocation, 1, newDayRowLocation + 24, 17);
+            var transposeSheet = wb.Worksheets.Add("Transpose", 2);
+            transposeSheet.Cell(1, 1).Value = range;
+
+            var transposeRange = transposeSheet.RangeUsed();
+            transposeRange.Transpose(XLTransposeOptions.MoveCells);
+
 
             wb.SaveAs(filepath);
         }
