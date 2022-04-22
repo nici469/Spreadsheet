@@ -59,7 +59,8 @@ namespace Spreadsheet
         }
 
         /// <summary>
-        /// creates a spreadsheet from a single string made up of several comma-separatedvalue lines
+        /// creates a spreadsheet from a single string made up of several comma-separatedvalue lines.
+        /// event tracking is turned off
         /// </summary>
         /// <param name="CSVData"></param>
         /// <param name="filepath"></param>
@@ -70,7 +71,7 @@ namespace Spreadsheet
             var dataJGD = processor.CSVtoJGD(CSVData);
 
             //init Spreadsheet
-            var wb = new XLWorkbook();
+            var wb = new XLWorkbook(XLEventTracking.Disabled);
             IXLWorksheet ws = wb.Worksheets.Add("Sheet1", 1);
 
             //loop through the rows in the csv data jgd array
@@ -108,11 +109,35 @@ namespace Spreadsheet
                         catch (Exception e)
                         {
                             ws.Cell(i + 1, (j + 2) / 2).Value = lineData[j];
+                            //if the "Time" label on a new day is found, store the location in the newDayRowLocation
+                            //only its most updated value is used evenually, i.e the most recent day in the csv file
+                            if (lineData[j] == "Time")
+                            {
+                                newDayRowLocation = i + 1;
+                            }
                         }
 
                     }
                 }
             }
+
+            IXLRange range = ws.Range(newDayRowLocation, 1, newDayRowLocation + 24, 17);
+            var transposeSheet = wb.Worksheets.Add("Transpose", 2);
+            
+            //copy the range values from old sheet to transpose sheet
+            transposeSheet.Cell(2, 1).Value = range;
+
+            //transpose the data in the new sheet
+            var transposeRange = transposeSheet.RangeUsed();
+            transposeRange.Transpose(XLTransposeOptions.MoveCells);
+
+            //create a string for the current day being transposed
+            var dateStr = date.Day + "-" + date.Month + "-" + date.Year;
+            transposeSheet.Cell(1, 2).Value = dateStr;
+            IXLRange timeCellLoc = transposeSheet.Range(1, 1, 1, 10);
+            timeCellLoc.Merge();
+            //timeCellLoc.Value = dateStr;
+
 
             wb.SaveAs(filepath);
         }
@@ -120,6 +145,7 @@ namespace Spreadsheet
 
         /// <summary>
         /// Creates a spreadsheet from an array of CSV strings
+        /// event tracking is disabled
         /// </summary>
         /// <param name="CSVData"></param>
         /// <param name="filepath"></param>
@@ -130,7 +156,7 @@ namespace Spreadsheet
             var dataJGD = processor.StringArraytoJGD(CSVData);
 
             //init Spreadsheet
-            var wb = new XLWorkbook();
+            var wb = new XLWorkbook(XLEventTracking.Disabled);
             IXLWorksheet ws = wb.Worksheets.Add("Sheet1", 1);
             ws.Columns().Width = 9;
             ws.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);//left alignment for the worksheet
@@ -183,12 +209,20 @@ namespace Spreadsheet
 
             IXLRange range = ws.Range(newDayRowLocation, 1, newDayRowLocation + 24, 17);
             var transposeSheet = wb.Worksheets.Add("Transpose", 2);
-            transposeSheet.Cell(1, 1).Value = range;
 
+            //copy the range values from old sheet to transpose sheet
+            transposeSheet.Cell(2, 1).Value = range;
+
+            //transpose the data in the new sheet
             var transposeRange = transposeSheet.RangeUsed();
             transposeRange.Transpose(XLTransposeOptions.MoveCells);
 
-
+            //create a string for the current day being transposed
+            var dateStr = date.Day + "-" + date.Month + "-" + date.Year;
+            //transposeSheet.Cell(1, 2).Value = dateStr;
+            IXLRange timeCellLoc = transposeSheet.Range(1, 1, 1, 10);
+            timeCellLoc.Merge();
+            timeCellLoc.Value = dateStr;
             wb.SaveAs(filepath);
         }
 
