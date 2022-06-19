@@ -1,0 +1,5 @@
+This code is a work s together with a its other half on nodejs (node red) IOT framework.
+the javascript code produces a special csv file, and this code generates a spreadsheet with the data from javascript, using the fromatting specified in the csv
+
+It produes a sheet of numbers representing reading taken from modbus equipment automaticall (hence eliminating human error)
+the javascript script code is not shown here for proprietary reasons
